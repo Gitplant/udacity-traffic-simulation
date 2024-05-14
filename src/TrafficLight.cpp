@@ -2,6 +2,23 @@
 #include <random>
 #include "TrafficLight.h"
 
+
+// For print statement in FP4.a
+std::ostream& operator<<(std::ostream& os, TrafficLightPhase phase) {
+    switch (phase) {
+        case TrafficLightPhase::red:
+            os << "red";
+            break;
+        case TrafficLightPhase::green:
+            os << "green";
+            break;
+        default:
+            os << "unknown";
+            break;
+    }
+    return os;
+}
+
 /* Implementation of class "MessageQueue" */
 
 
@@ -18,6 +35,11 @@ void MessageQueue<T>::send(T &&msg)
 {
     // FP.4a : The method send should use the mechanisms std::lock_guard<std::mutex>
     // as well as _condition.notify_one() to add a new message to the queue and afterwards send a notification.
+    std::lock_guard<std::mutex> lock(_mutex);  // FP4.a
+    // std::cout << "Adding message " << msg; //<< " to the queue.\n";  // FP4.a
+    std::cout << "Adding message " << msg << " to the queue.\n";
+    _queue.push_back(std::move(msg));  // FP4.a
+    _condition.notify_one();  // FP4.a
 }
 
 
