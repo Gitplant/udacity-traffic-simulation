@@ -20,8 +20,12 @@ class MessageQueue
 {
 public:
 void send(T &&msg);  // FP.2a
+T receive();  // FP.3
 
 private:
+std::deque<T> _queue;  // FP.3
+std::condition_variable _cond;  // FP.3
+std::mutex _mutex;  // FP.3
 
 };
 
