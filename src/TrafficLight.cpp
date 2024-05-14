@@ -12,14 +12,14 @@ T MessageQueue<T>::receive()
     // to wait for and receive new messages and pull them from the queue using move semantics.
     // The received object should then be returned by the receive function.
 }
-
+*/
 template <typename T>
 void MessageQueue<T>::send(T &&msg)
 {
     // FP.4a : The method send should use the mechanisms std::lock_guard<std::mutex>
     // as well as _condition.notify_one() to add a new message to the queue and afterwards send a notification.
 }
-*/
+/*
 
 /* Implementation of class "TrafficLight" */
 
@@ -54,4 +54,36 @@ void TrafficLight::cycleThroughPhases()
     // and toggles the current phase of the traffic light between red and green and sends an update method
     // to the message queue using move semantics. The cycle duration should be a random value between 4 and 6 seconds.
     // Also, the while-loop should use std::this_thread::sleep_for to wait 1ms between two cycles.
+
+    // --- Start FP.2a ---
+    // The cycle duration should be a random value between 4 and 6 seconds.
+    long duration = 0;
+    auto t0 = std::chrono::system_clock::now();
+    std::uniform_int_distribution<int> dist(4000, 6000);
+
+    while (true){
+        std::random_device rd;
+        std::mt19937 gen(rd());
+        int cycleDuration = dist(gen);
+
+        if(duration >= cycleDuration){
+        std::cout << "cycleDuration = " << cycleDuration << ", duration = " << duration << "\n";
+            auto t0 = std::chrono::system_clock::now();
+            // toggled the current phase of the traffic light between red and green
+            if (_currentPhase == TrafficLightPhase::red){
+                _currentPhase = TrafficLightPhase::green;
+            }
+                else{
+                _currentPhase = TrafficLightPhase::red;
+            }
+            // send an update method to the message queue using move semantics
+            _messageQueue.send(std::move(_currentPhase));
+        }
+        // the while-loop should use std::this_thread::sleep_for to wait 1ms between two cycles
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        auto t1 = std::chrono::system_clock::now();
+        duration = std::chrono::duration_cast<std::chrono::milliseconds>( t1 - t0).count();
+    }
+    // -- Finish FP2.a ---
+
 }
