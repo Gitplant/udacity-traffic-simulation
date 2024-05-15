@@ -97,28 +97,37 @@ void TrafficLight::cycleThroughPhases()
     // Also, the while-loop should use std::this_thread::sleep_for to wait 1ms between two cycles.
 
     // --- Start FP.2a ---
-    // The cycle duration should be a random value between 4 and 6 seconds.
+
+    // Initialize variables
     long duration = 0;
     auto t0 = std::chrono::system_clock::now();
+    auto t1 = std::chrono::system_clock::now();
+
+    // Set duration for first cycle
+    // The cycle duration should be a random value between 4 and 6 seconds
     std::uniform_int_distribution<int> dist(4000, 6000);
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    int cycleDuration = dist(gen);
 
     while (true){
-        std::random_device rd;
-        std::mt19937 gen(rd());
-        int cycleDuration = dist(gen);
-
         if(duration >= cycleDuration){
-        std::cout << "cycleDuration = " << cycleDuration << ", duration = " << duration << "\n";
-            auto t0 = std::chrono::system_clock::now();
+            // std::cout << "duration = " << duration << ", cycleDuration = " << cycleDuration << "\n";
+            t0 = std::chrono::system_clock::now();
             // toggled the current phase of the traffic light between red and green
             if (_currentPhase == TrafficLightPhase::red){
                 _currentPhase = TrafficLightPhase::green;
             }
-                else{
+            else{
                 _currentPhase = TrafficLightPhase::red;
             }
             // send an update method to the message queue using move semantics
             _messageQueue.send(std::move(_currentPhase));
+
+            // Set duration of next cycle:
+            std::random_device rd;
+            std::mt19937 gen(rd());
+            cycleDuration = dist(gen);
         }
         // the while-loop should use std::this_thread::sleep_for to wait 1ms between two cycles
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
